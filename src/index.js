@@ -55,8 +55,17 @@ export function checkSelector(selector) {
   const ret = { dependencies, recomputations, isNamed, selectorName }
   if (_getState) {
     const state = _getState()
-    const inputs = dependencies.map((parentSelector) => parentSelector(state))
-    const output = selector(state)
+    const inputs = dependencies.map((parentSelector) => {
+      let input = parentSelector(state)
+      if (input && input.toJS) {
+        input = input.toJS()
+      }
+      return input
+    })
+    let output = selector(state)
+    if (output && output.toJS) {
+      output = output.toJS()
+    }
     Object.assign(ret, { inputs, output })
   }
 
